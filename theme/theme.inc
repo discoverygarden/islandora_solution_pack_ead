@@ -28,8 +28,16 @@
 function islandora_ead_preprocess_islandora_ead(&$variables) {
   $object = $variables['object'];
 
+  if (!isset($object['EAD'])) {
+    $variables['content'] = array(
+      'narrative' => '',
+    );
+    return;
+  }
+
   module_load_include('inc', 'islandora_ead', 'includes/utilities');
   $associated_objs = islandora_ead_retrieve_associations($object->id);
+  drupal_add_js(drupal_get_path('module', 'islandora_ead') . '/js/eadPopovers.js');
 
   $xsl = new DOMDocument();
   $xsl->load(drupal_get_path('module', 'islandora_ead') . '/xml/islandora_eadToHTML.xsl');

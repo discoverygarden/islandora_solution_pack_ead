@@ -63,12 +63,19 @@ function islandora_ead_upload_form_submit(array $form, array &$form_state) {
   $ds->label = $file->filename;
   $ds->mimetype = $file->filemime;
 
-  $eadxml = simplexml_load_file($path);
-  if (isset($eadxml->archdesc->did->unittitle)) {
-    $unittitle = $eadxml->archdesc->did->unittitle;
-    $unitid = isset($eadxml->archdesc->did->unitid) ? $eadxml->archdesc->did->unitid . " " : "";
-    $unitdate = isset($eadxml->archdesc->did->unitdate) ? ", " . $eadxml->archdesc->did->unitdate : "";
+  $eadxml = new DOMDocument();
+  $eadxml->load($path);
+  $eadxp = new DOMXPath($eadxml);
+  $eadxp->registerNamespace('ead', 'http://ead3.archivists.org/schema/');
 
-    $object->label = "$unitid$unittitle$unitdate";
+  $unittitle = $eadxp->query('/ead:ead/ead:archdesc/ead:did/ead:unittitle');
+  if ($unittitle->length) {
+    $unitid = $eadxp->query('/ead:ead/ead:archdesc/ead:did/ead:unitid');
+    $unitdate = $eadxp->query('/ead:ead/ead:archdesc/ead:did/ead:unitdate');
+    $object->label = format_string('!id!title!date', array(
+      '@id' => $unitid->length ? $unitid->item(0)->textContent . " " : "",
+      '@title' => $unittitle->item(0)->textContent,
+      '@date' => $unitdate->length ? ", " . $unitdate->item(0)->textContent : "",
+    ));
   }
 }

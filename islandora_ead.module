@@ -28,14 +28,6 @@
 function islandora_ead_menu() {
   $items = array();
 
-  $items['islandora/ead/lookup'] = array(
-    'type' => MENU_CALLBACK,
-    'title' => 'EAD Lookup by ID',
-    'file' => 'includes/utilities.inc',
-    'page callback' => 'islandora_ead_id_lookup',
-    'access arguments' => array(ISLANDORA_VIEW_OBJECTS),
-  );
-
   $items['islandora/object/%islandora_object/manage/ead'] = array(
     'type' => MENU_LOCAL_TASK,
     'title' => 'EAD',
