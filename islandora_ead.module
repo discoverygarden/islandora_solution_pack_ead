@@ -50,6 +50,7 @@ function islandora_ead_menu() {
 
   return $items;
 }
+
 /**
  * Implements hook_theme().
  */

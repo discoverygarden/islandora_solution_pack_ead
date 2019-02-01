@@ -20,12 +20,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-(function($) {
+(function ($) {
   "use strict";
 
   Drupal.behaviors.islandoraEadAddPopovers = {
-    attach: function(context, settings) {
-      $('.hasPopover').each(function() {
+    attach: function (context, settings) {
+      $('.hasPopover').each(function () {
         var url = jQuery(this).attr('href') + "/datastream/TN/view";
         var img = '<img src="' + url + '"/>';
         $(this).popover({ trigger: 'hover', content: img, html: true });
