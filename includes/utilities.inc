@@ -23,6 +23,34 @@
  */
 
 /**
+ * Autocomplete callback; return all objects that can be an association.
+ */
+function islandora_ead_get_potential_associations($search_value) {
+  $tuque = islandora_get_tuque_connection();
+  $query = <<<EOQ
+SELECT ?pid ?label
+FROM <#ri>
+WHERE {
+  ?pid <fedora-model:label> ?label
+  FILTER(regex(?label, '$search_value', 'i') || regex(str(?pid), '$search_value', 'i'))
+}
+EOQ;
+  $results = $tuque->repository->ri->sparqlQuery($query);
+
+  $return = array();
+  foreach ($results as $objects) {
+    $pid = $objects['pid']['value'];
+    if (islandora_namespace_accessible($pid)) {
+      $return[$pid] = t('@label (@pid)', array(
+        '@label' => $objects['label']['value'],
+        '@pid' => $pid,
+      ));
+    }
+  }
+  drupal_json_output($return);
+}
+
+/**
  * Return mapping of internal inventory level IDs to PIDs of associated objects.
  *
  * @param string $eadid
@@ -47,4 +75,67 @@ EOQ;
   }
 
   return $associations;
+}
+
+/**
+ * Get the associated object for the given EAD object and refid.
+ *
+ * @param string $eadid
+ *   The PID of the EAD object to retrieve the association of.
+ * @param string $refid
+ *   The level ID to retrieve the association of.
+ *
+ * @return string
+ *   The PID of the associated object or NULL.
+ */
+function islandora_ead_retrieve_refid_association($eadid, $refid) {
+  $tuque = islandora_get_tuque_connection();
+  $sparql_query = <<<EOQ
+SELECT ?partid
+FROM <#ri>
+WHERE {
+  ?partid <fedora-rels-ext:isPartOf> <info:fedora/$eadid> ;
+          <fedora-rels-ext:eadLevelId> <info:fedora/$refid> .
+}
+EOQ;
+
+  $sparql_results = $tuque->repository->ri->sparqlQuery($sparql_query);
+  return $sparql_results ? $sparql_results[0]['partid']['value'] : NULL;
+}
+
+/**
+ * Get the level information for the given EAD object and refid.
+ *
+ * @param AbstractObject $ead
+ *   The EAD object to retrieve the association of.
+ * @param string $refid
+ *   The level ID to retrieve the association of.
+ *
+ * @return string
+ *   String describing the level information.
+ */
+function islandora_ead_get_level_info(AbstractObject $ead, $refid) {
+  $xsl = new DOMDocument();
+  $xsl->load(drupal_get_path('module', 'islandora_ead') . '/xml/getEadLevels.xsl');
+
+  $xslt = new XSLTProcessor();
+  $xslt->importStyleSheet($xsl);
+
+  $ead_dom = new DOMDocument();
+  $ead_dom->loadXML($ead['EAD']->content);
+  $ead_dom = $xslt->transformToDoc($ead_dom);
+
+  $xpath = new DOMXPath($ead_dom);
+  $entity = $xpath->query("/entities/entity[id = '$refid']")->item(0);
+  $containers = array();
+  foreach ($xpath->query('container', $entity) as $container) {
+    $type = $xpath->query('type', $container)->item(0)->textContent;
+    $value = $xpath->query('value', $container)->item(0)->textContent;
+    $containers[] = format_string("!type: !value", array(
+      '!type' => $type,
+      '!value' => $value,
+    ));
+  }
+  $level_info = implode(', ', $containers);
+  return $level_info;
 }

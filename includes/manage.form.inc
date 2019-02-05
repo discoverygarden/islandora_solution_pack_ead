@@ -128,8 +128,14 @@ function _islandora_ead_get_entity_column_info($pid, DOMNode $entity, DOMXPath $
     }
   }
   $info[] = implode(', ', $containers);
-  $info[] = $id && array_key_exists($id, $associations) ?
-    l(filter_xss($associations[$id]), "islandora/object/{$associations[$id]}") :
-    l(t('Add Association'), "islandora/object/{$pid}/manage/ead/{$id}");
+
+  $association_form_url = format_string('islandora/object/!pid/manage/ead/!refid', array(
+    '!pid' => $pid,
+    '!refid' => $id,
+  ));
+  if (array_key_exists($id, $associations)) {
+    $association_form_url .= '/existing';
+  }
+  $info[] = l(t('Manage Association'), $association_form_url);
   return $info;
 }
