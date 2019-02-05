@@ -22,6 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+const ISLANDORA_EAD_NAMESPACE = 'urn:isbn:1-931666-22-9';
+
 /**
  * Implements hook_menu().
  */
@@ -124,10 +126,8 @@ function islandora_ead_manage_access_callback($object) {
     ISLANDORA_METADATA_EDIT,
     ISLANDORA_PURGE,
   );
-
   $content_models = array('islandora:eadCModel');
-
-  return islandora_user_access($object, $permissions, $content_models);
+  return isset($object['EAD']) && islandora_user_access($object, $permissions, $content_models);
 }
 
 /**

@@ -33,14 +33,6 @@
  *   The object representing the EAD.
  */
 function islandora_ead_manage_form(array $form, array &$form_state, AbstractObject $object) {
-  if (!isset($object['EAD'])) {
-    return array(
-      'no_ead' => array(
-        '#markup' => t('No EAD Datastream'),
-      ),
-    );
-  }
-
   module_load_include('inc', 'islandora_ead', 'includes/utilities');
 
   $header = array(

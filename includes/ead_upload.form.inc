@@ -66,16 +66,16 @@ function islandora_ead_upload_form_submit(array $form, array &$form_state) {
   $eadxml = new DOMDocument();
   $eadxml->load($path);
   $eadxp = new DOMXPath($eadxml);
-  $eadxp->registerNamespace('ead', 'http://ead3.archivists.org/schema/');
+  $eadxp->registerNamespace('ead', ISLANDORA_EAD_NAMESPACE);
 
-  $unittitle = $eadxp->query('/ead:ead/ead:archdesc/ead:did/ead:unittitle');
-  if ($unittitle->length) {
-    $unitid = $eadxp->query('/ead:ead/ead:archdesc/ead:did/ead:unitid');
-    $unitdate = $eadxp->query('/ead:ead/ead:archdesc/ead:did/ead:unitdate');
+  $unittitle = $eadxp->evaluate('normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unittitle[1])');
+  if ($unittitle) {
+    $unitid = $eadxp->evaluate('normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unitid[1])');
+    $unitdate = $eadxp->evaluate('normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unitdate[1])');
     $object->label = format_string('!id!title!date', array(
-      '@id' => $unitid->length ? $unitid->item(0)->textContent . " " : "",
-      '@title' => $unittitle->item(0)->textContent,
-      '@date' => $unitdate->length ? ", " . $unitdate->item(0)->textContent : "",
+      '@id' => $unitid ? "$unitid " : "",
+      '@title' => $unittitle,
+      '@date' => $unitdate ? ", $unitdate" : "",
     ));
   }
 }
