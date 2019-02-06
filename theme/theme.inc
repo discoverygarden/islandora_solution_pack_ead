@@ -37,6 +37,10 @@ function islandora_ead_preprocess_islandora_ead(&$variables) {
 
   module_load_include('inc', 'islandora_ead', 'includes/utilities');
   $associated_objs = islandora_ead_retrieve_associations($object->id);
+  $bootstrap = libraries_get_path('bootstrap');
+  drupal_add_css($bootstrap . '/bootstrap.min.css');
+  drupal_add_js($bootstrap . '/bootstrap.min.js');
+  drupal_add_js(drupal_get_path('module', 'islandora_ead') . '/js/eadPopovers.js');
 
   $xsl = new DOMDocument();
   $xsl->load(drupal_get_path('module', 'islandora_ead') . '/xml/islandora_eadToHTML.xsl');
@@ -59,6 +63,7 @@ function islandora_ead_preprocess_islandora_ead(&$variables) {
       if ($element->childNodes->length > 0) {
         $href = $object_actual_dom->createElement('a');
         $href->setAttribute('href', "/islandora/object/$pid");
+        $href->setAttribute('class', "hasPopover");
 
         $child_node = $element->childNodes->item(0);
         $sibling_node = $child_node->nextSibling;
