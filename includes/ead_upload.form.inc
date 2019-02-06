@@ -72,7 +72,7 @@ function islandora_ead_upload_form_submit(array $form, array &$form_state) {
   if ($unittitle) {
     $unitid = $eadxp->evaluate('normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unitid[1])');
     $unitdate = $eadxp->evaluate('normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unitdate[1])');
-    $object->label = format_string('!id!title!date', array(
+    $object->label = format_string('@id@title@date', array(
       '@id' => $unitid ? "$unitid " : "",
       '@title' => $unittitle,
       '@date' => $unitdate ? ", $unitdate" : "",

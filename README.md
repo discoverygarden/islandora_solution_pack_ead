@@ -12,10 +12,12 @@ This module requires the following modules/libraries:
 * [Islandora](https://github.com/islandora/islandora)
 * [Tuque](https://github.com/islandora/tuque)
 
-In addition, the minified versions of [Bootstrap](https://getbootstrap.com/)
-should be downloaded and placed in sites/all/libraries, extracted into a folder
-called 'bootstrap'. This should contain the `bootstrap.min.css` and
-`bootstrap.min.js` files.
+In addition, [Bootstrap](https://getbootstrap.com/) and
+[Popper.js](https://github.com/FezVrasta/popper.js) should be downloaded and
+placed in sites/all/libraries:
+
+* Bootstrap should be extracted into a libraries folder called 'bootstrap'
+* `popper.min.js` should be placed in a libraries folder called 'popper.js'
 
 ## Installation
 
