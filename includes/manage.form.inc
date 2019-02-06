@@ -33,11 +33,16 @@
  *   The object representing the EAD.
  */
 function islandora_ead_manage_form(array $form, array &$form_state, AbstractObject $object) {
+  module_load_include('inc', 'islandora_ead', 'includes/utilities');
 
   $header = array(
-    'level' => t('Level'),
-    'info' => t('Info'),
-    'association' => t('Association'),
+    t('Level'),
+    t('Title'),
+    t('Extent'),
+    t('Description'),
+    t('ID'),
+    t('Containers'),
+    t('Association'),
   );
 
   $xsl = new DOMDocument();
@@ -46,54 +51,27 @@ function islandora_ead_manage_form(array $form, array &$form_state, AbstractObje
   $xslt = new XSLTProcessor();
   $xslt->importStyleSheet($xsl);
 
-  module_load_include('inc', 'islandora_ead', 'includes/utilities');
-  $associations = islandora_ead_retrieve_associations($object->id);
-
   $ead_dom = new DOMDocument();
   $ead_dom->loadXML($object['EAD']->content);
   $ead_dom = $xslt->transformToDoc($ead_dom);
 
-  $partsxml = new SimpleXMLElement($ead_dom->saveXML());
+  $partsxml = new DOMDocument();
+  $partsxml->loadXML($ead_dom->saveXML());
+  $partsxp = new DOMXPath($partsxml);
+  $entities = $partsxp->query('/entities/entity');
 
-  $parts_idx = 1;
+  $limit = 20;
+  pager_default_initialize($entities->length, $limit);
+  $page = pager_find_page();
+
   $parts = array();
-  foreach ($partsxml->entity as $entity) {
-
-    $info = $entity->title;
-    if (trim($entity->extent) !== '') {
-      $info .= "<br/>$entity->extent";
-    }
-    if (trim($entity->desc) !== '') {
-      $info .= "<br/>$entity->desc";
-    }
-
-    $containers = array();
-    foreach ($entity->container as $container) {
-      if (trim($container->type) !== '') {
-        $containers[] = "$container->type: $container->value";
-      }
-    }
-
-    if ($containers) {
-      $info .= "<br/>" . implode(", ", $containers);
-    }
-
-    $entity_id = (string) $entity->id;
-
-    if (array_key_exists($entity_id, $associations)) {
-      $association = $associations[$entity_id];
-      $assoc_link = "<a href='/islandora/object/$association'>$association</a>";
-    }
-    else {
-      $assoc_link = "<a href='/islandora/object/$object->id/manage/ead/$entity->id'>Add Association</a>";
-    }
-
-    $parts[$parts_idx++] = array(
-      'level' => $entity->level,
-      'info' => $info,
-      'association' => $assoc_link,
-    );
-
+  $associations = islandora_ead_retrieve_associations($object->id);
+  // Little bit of optimization; DOMNodeList::length is computed, so let's do
+  // that once.
+  $entities_length = $entities->length;
+  $page_start = $limit * $page;
+  for ($idx = $page_start; $idx < min($limit + $page_start, $entities_length); $idx++) {
+    $parts[$idx] = _islandora_ead_get_entity_column_info($object->id, $entities->item($idx), $partsxp, $associations);
   }
 
   $form['table'] = array(
@@ -102,6 +80,56 @@ function islandora_ead_manage_form(array $form, array &$form_state, AbstractObje
     '#rows' => $parts,
     '#empty' => 'Empty Finding Aid',
   );
+  $form['pager'] = array('#theme' => 'pager');
 
   return $form;
+}
+
+/**
+ * Helper function to get a formatted array of entity info for use in the table.
+ *
+ * @param string $pid
+ *   The PID of the object this column info is being generated for.
+ * @param DOMNode $entity
+ *   The entity node to get information from.
+ * @param DOMXPath $dxp
+ *   A DOMXPath object for the entity XML.
+ * @param array $associations
+ *   Array representing associations for the object from which this entity was
+ *   sourced, as returned by islandora_ead_retrieve_associations().
+ *
+ * @return array
+ *   An array of column information for the table row for this entity.
+ */
+function _islandora_ead_get_entity_column_info($pid, DOMNode $entity, DOMXPath $dxp, array $associations) {
+  $first_or_null = function ($val, $relative) use ($dxp) {
+    $list = $dxp->query($val, $relative);
+    if (!$list->length) {
+      return NULL;
+    }
+    return (string) trim($list->item(0)->textContent);
+  };
+  $id = $first_or_null('id', $entity);
+  $info = array(
+    'level' => $first_or_null('level', $entity),
+    'title' => $first_or_null('title', $entity),
+    'extent' => $first_or_null('extent', $entity),
+    'desc' => $first_or_null('desc', $entity),
+    'id' => $id,
+  );
+  $containers = array();
+  foreach ($dxp->query('container', $entity) as $container) {
+    $container_bits = array(
+      'type' => $first_or_null('type', $container),
+      'value' => $first_or_null('value', $container),
+    );
+    if ($container_bits['type']) {
+      $containers[] = "{$container_bits['type']}: {$container_bits['value']}";
+    }
+  }
+  $info[] = implode(', ', $containers);
+  $info[] = $id && array_key_exists($id, $associations) ?
+    l(filter_xss($associations[$id]), "islandora/object/{$associations[$id]}") :
+    l(t('Add Association'), "islandora/object/{$pid}/manage/ead/{$id}");
+  return $info;
 }

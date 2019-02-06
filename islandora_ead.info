@@ -22,5 +22,3 @@ dependencies[] = islandora
 dependencies[] = file
 version = 7.x-dev
 core = 7.x
-
-scripts[] = js/eadPopovers.js

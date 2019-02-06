@@ -63,12 +63,19 @@ function islandora_ead_upload_form_submit(array $form, array &$form_state) {
   $ds->label = $file->filename;
   $ds->mimetype = $file->filemime;
 
-  $eadxml = simplexml_load_file($path);
-  if (isset($eadxml->archdesc->did->unittitle)) {
-    $unittitle = $eadxml->archdesc->did->unittitle;
-    $unitid = isset($eadxml->archdesc->did->unitid) ? $eadxml->archdesc->did->unitid . " " : "";
-    $unitdate = isset($eadxml->archdesc->did->unitdate) ? ", " . $eadxml->archdesc->did->unitdate : "";
+  $eadxml = new DOMDocument();
+  $eadxml->load($path);
+  $eadxp = new DOMXPath($eadxml);
+  $eadxp->registerNamespace('ead', ISLANDORA_EAD_NAMESPACE);
 
-    $object->label = "$unitid$unittitle$unitdate";
+  $unittitle = $eadxp->evaluate('normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unittitle[1])');
+  if ($unittitle) {
+    $unitid = $eadxp->evaluate('normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unitid[1])');
+    $unitdate = $eadxp->evaluate('normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unitdate[1])');
+    $object->label = format_string('@id@title@date', array(
+      '@id' => $unitid ? "$unitid " : "",
+      '@title' => $unittitle,
+      '@date' => $unitdate ? ", $unitdate" : "",
+    ));
   }
 }
