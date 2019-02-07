@@ -2,8 +2,7 @@
 
 /**
  * @file
- * Handles the display/submission for associating an EAD with an existing
- * object.
+ * Handles display/submission for associating an EAD with an existing object.
  */
 
 /**
@@ -43,7 +42,7 @@ function islandora_ead_association_existing_object_form(array $form, array &$for
   );
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Submit'),
+    '#value' => t('Link Object'),
   );
 
   return $form;

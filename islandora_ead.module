@@ -65,7 +65,11 @@ function islandora_ead_menu() {
     'title' => 'Associate With Existing Object',
     'file' => 'includes/association_existing_object.form.inc',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('islandora_ead_association_existing_object_form', 2, 5),
+    'page arguments' => array(
+      'islandora_ead_association_existing_object_form',
+      2,
+      5,
+    ),
     'access callback' => 'islandora_ead_manage_access_callback',
     'access arguments' => array(2),
   );
