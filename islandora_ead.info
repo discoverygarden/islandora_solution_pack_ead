@@ -19,6 +19,7 @@ name = "Islandora EAD Solution Pack"
 description = "Provides an interface for EAD objects."
 package = Islandora
 dependencies[] = islandora
+dependencies[] = islandora_solr
 dependencies[] = file
 version = 7.x-dev
 core = 7.x

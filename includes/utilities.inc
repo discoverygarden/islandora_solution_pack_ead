@@ -26,28 +26,32 @@
  * Autocomplete callback; return all objects that can be an association.
  */
 function islandora_ead_get_potential_associations($search_value) {
-  $tuque = islandora_get_tuque_connection();
-  $query = <<<EOQ
-SELECT ?pid ?label
-FROM <#ri>
-WHERE {
-  ?pid <fedora-model:label> ?label
-  FILTER(regex(?label, '$search_value', 'i') || regex(str(?pid), '$search_value', 'i'))
-}
-EOQ;
-  $results = $tuque->repository->ri->sparqlQuery($query);
 
-  $return = array();
-  foreach ($results as $objects) {
-    $pid = $objects['pid']['value'];
-    if (islandora_namespace_accessible($pid)) {
-      $return[$pid] = t('@label (@pid)', array(
-        '@label' => $objects['label']['value'],
-        '@pid' => $pid,
-      ));
-    }
+  $label_field = variable_get('islandora_solr_object_label_field', 'fgs_label_s');
+
+  // Make the query.
+  $qp = new IslandoraSolrQueryProcessor();
+  $query = islandora_solr_lesser_escape("$search_value*");
+  $qp->buildQuery($query);
+  $qp->solrParams['fl'] = "$label_field,PID";
+  $qp->executeQuery(FALSE);
+
+  // Helper function to construct labels.
+  $construct_label = function ($data) use ($label_field) {
+    $label = isset($data['solr_doc'][$label_field]) ? $data['solr_doc'][$label_field] : '';
+    return t('@label (@pid)', array(
+      '@label' => $label,
+      '@pid' => $data['solr_doc']['PID'],
+    ));
+  };
+
+  $results = array();
+  foreach ($qp->islandoraSolrResult['response']['objects'] as $result) {
+    $results[$result['PID']] = $construct_label($result);
   }
-  drupal_json_output($return);
+  ksort($results);
+  drupal_json_output($results);
+  drupal_exit();
 }
 
 /**
@@ -89,18 +93,16 @@ EOQ;
  *   The PID of the associated object or NULL.
  */
 function islandora_ead_retrieve_refid_association($eadid, $refid) {
-  $tuque = islandora_get_tuque_connection();
-  $sparql_query = <<<EOQ
-SELECT ?partid
-FROM <#ri>
-WHERE {
-  ?partid <fedora-rels-ext:isPartOf> <info:fedora/$eadid> ;
-          <fedora-rels-ext:eadLevelId> <info:fedora/$refid> .
-}
-EOQ;
+  $qp = new IslandoraSolrQueryProcessor();
+  $qp->solrParams['fl'] = 'PID';
+  $qp->solrParams['fq'] = array(
+    "RELS_EXT_isPartOf_uri_ms:\"info:fedora/{$eadid}\"",
+    "RELS_EXT_eadLevelId_uri_ms:\"info:fedora/{$refid}\"",
+  );
+  $qp->executeQuery(FALSE);
 
-  $sparql_results = $tuque->repository->ri->sparqlQuery($sparql_query);
-  return $sparql_results ? $sparql_results[0]['partid']['value'] : NULL;
+  $result = $qp->islandoraSolrResult['response']['objects'];
+  return isset($result[0]['PID']) ? $result[0]['PID'] : NULL;
 }
 
 /**
