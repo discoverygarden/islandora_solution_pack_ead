@@ -129,12 +129,14 @@ function islandora_ead_get_level_info(AbstractObject $ead, $refid) {
   $entity = $xpath->query("/entities/entity[id = '$refid']")->item(0);
   $containers = array();
   foreach ($xpath->query('container', $entity) as $container) {
-    $type = $xpath->query('type', $container)->item(0)->textContent;
-    $value = $xpath->query('value', $container)->item(0)->textContent;
-    $containers[] = format_string("!type: !value", array(
-      '!type' => $type,
-      '!value' => $value,
-    ));
+    $type = $xpath->evaluate('string(type)', $container);
+    $value = $xpath->evaluate('string(value)', $container);
+    if ($type && $value) {
+      $containers[] = format_string("!type: !value", array(
+        '!type' => $type,
+        '!value' => $value,
+      ));
+    }
   }
   $level_info = implode(', ', $containers);
   return $level_info;
