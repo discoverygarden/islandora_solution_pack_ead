@@ -34,6 +34,7 @@ function islandora_ead_get_potential_associations($search_value) {
   $query = islandora_solr_lesser_escape("$search_value*");
   $qp->buildQuery($query);
   $qp->solrParams['fl'] = "$label_field,PID";
+  $qp->solrParams['sort'] = "PID asc";
   $qp->executeQuery(FALSE);
 
   // Helper function to construct labels.
@@ -49,7 +50,6 @@ function islandora_ead_get_potential_associations($search_value) {
   foreach ($qp->islandoraSolrResult['response']['objects'] as $result) {
     $results[$result['PID']] = $construct_label($result);
   }
-  ksort($results);
   drupal_json_output($results);
   drupal_exit();
 }
