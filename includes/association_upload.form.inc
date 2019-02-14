@@ -81,8 +81,12 @@ function islandora_ead_association_upload_form(array $form, array &$form_state, 
     '#title' => t('File'),
     '#required' => TRUE,
     '#default_value' => isset($form_state['values']['file_upload']) ? $form_state['values']['file_upload'] : NULL,
-    '#description' => filter_xss(t('Select file to upload.<br/>Files must be less than <b>!size MB.</b><br/>Allowed file types: <b>!ext.</b>',
-                                   array('!size' => $upload_size, '!ext' => $extensions[0])), array('br', 'b')),
+    '#description' => filter_xss(
+      t('Select file to upload.<br/>Files must be less than <b>!size MB.</b><br/>Allowed file types: <b>!ext.</b>',
+        array('!size' => $upload_size, '!ext' => $extensions[0])
+      ),
+      array('br', 'b')
+    ),
     '#upload_location' => 'temporary://',
     '#upload_validators' => array(
       'file_validate_extensions' => $extensions,

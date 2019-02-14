@@ -43,9 +43,41 @@ function islandora_ead_menu() {
   $items['islandora/object/%islandora_object/manage/ead/%'] = array(
     'type' => MENU_CALLBACK,
     'title' => 'Modify Association',
+    'file' => 'includes/association_management.form.inc',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_ead_manage_association_form', 2, 5),
+    'access callback' => 'islandora_ead_manage_access_callback',
+    'access arguments' => array(2),
+  );
+
+  $items['islandora/object/%islandora_object/manage/ead/%/create'] = array(
+    'type' => MENU_CALLBACK,
+    'title' => 'Create New Object',
     'file' => 'includes/association_upload.form.inc',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('islandora_ead_association_upload_form', 2, 5),
+    'access callback' => 'islandora_ead_manage_access_callback',
+    'access arguments' => array(2),
+  );
+
+  $items['islandora/object/%islandora_object/manage/ead/%/existing'] = array(
+    'type' => MENU_CALLBACK,
+    'title' => 'Associate With Existing Object',
+    'file' => 'includes/association_existing_object.form.inc',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array(
+      'islandora_ead_association_existing_object_form',
+      2,
+      5,
+    ),
+    'access callback' => 'islandora_ead_manage_access_callback',
+    'access arguments' => array(2),
+  );
+
+  $items['islandora/object/%islandora_object/manage/ead/get_potential_associations'] = array(
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/utilities.inc',
+    'page callback' => 'islandora_ead_get_potential_associations',
     'access callback' => 'islandora_ead_manage_access_callback',
     'access arguments' => array(2),
   );

@@ -23,6 +23,38 @@
  */
 
 /**
+ * Autocomplete callback; return all objects that can be an association.
+ */
+function islandora_ead_get_potential_associations($search_value) {
+
+  $label_field = variable_get('islandora_solr_object_label_field', 'fgs_label_s');
+
+  // Make the query.
+  $qp = new IslandoraSolrQueryProcessor();
+  $query = islandora_solr_lesser_escape("$search_value*");
+  $qp->buildQuery($query);
+  $qp->solrParams['fl'] = "$label_field,PID";
+  $qp->solrParams['sort'] = "PID asc";
+  $qp->executeQuery(FALSE);
+
+  // Helper function to construct labels.
+  $construct_label = function ($data) use ($label_field) {
+    $label = isset($data['solr_doc'][$label_field]) ? $data['solr_doc'][$label_field] : '';
+    return t('@label (@pid)', array(
+      '@label' => $label,
+      '@pid' => $data['solr_doc']['PID'],
+    ));
+  };
+
+  $results = array();
+  foreach ($qp->islandoraSolrResult['response']['objects'] as $result) {
+    $results[$result['PID']] = $construct_label($result);
+  }
+  drupal_json_output($results);
+  drupal_exit();
+}
+
+/**
  * Return mapping of internal inventory level IDs to PIDs of associated objects.
  *
  * @param string $eadid
@@ -47,4 +79,67 @@ EOQ;
   }
 
   return $associations;
+}
+
+/**
+ * Get the associated object for the given EAD object and refid.
+ *
+ * @param string $eadid
+ *   The PID of the EAD object to retrieve the association of.
+ * @param string $refid
+ *   The level ID to retrieve the association of.
+ *
+ * @return string
+ *   The PID of the associated object or NULL.
+ */
+function islandora_ead_retrieve_refid_association($eadid, $refid) {
+  $qp = new IslandoraSolrQueryProcessor();
+  $qp->solrParams['fl'] = 'PID';
+  $qp->solrParams['fq'] = array(
+    "RELS_EXT_isPartOf_uri_ms:\"info:fedora/{$eadid}\"",
+    "RELS_EXT_eadLevelId_uri_ms:\"info:fedora/{$refid}\"",
+  );
+  $qp->executeQuery(FALSE);
+
+  $result = $qp->islandoraSolrResult['response']['objects'];
+  return isset($result[0]['PID']) ? $result[0]['PID'] : NULL;
+}
+
+/**
+ * Get the level information for the given EAD object and refid.
+ *
+ * @param AbstractObject $ead
+ *   The EAD object to retrieve the association of.
+ * @param string $refid
+ *   The level ID to retrieve the association of.
+ *
+ * @return string
+ *   String describing the level information.
+ */
+function islandora_ead_get_level_info(AbstractObject $ead, $refid) {
+  $xsl = new DOMDocument();
+  $xsl->load(drupal_get_path('module', 'islandora_ead') . '/xml/getEadLevels.xsl');
+
+  $xslt = new XSLTProcessor();
+  $xslt->importStyleSheet($xsl);
+
+  $ead_dom = new DOMDocument();
+  $ead_dom->loadXML($ead['EAD']->content);
+  $ead_dom = $xslt->transformToDoc($ead_dom);
+
+  $xpath = new DOMXPath($ead_dom);
+  $entity = $xpath->query("/entities/entity[id = '$refid']")->item(0);
+  $containers = array();
+  foreach ($xpath->query('container', $entity) as $container) {
+    $type = $xpath->evaluate('string(type)', $container);
+    $value = $xpath->evaluate('string(value)', $container);
+    if ($type && $value) {
+      $containers[] = format_string("!type: !value", array(
+        '!type' => $type,
+        '!value' => $value,
+      ));
+    }
+  }
+  $level_info = implode(', ', $containers);
+  return $level_info;
 }
