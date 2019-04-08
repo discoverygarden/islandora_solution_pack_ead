@@ -83,12 +83,6 @@ function islandora_ead_association_existing_object_form_submit(array $form, arra
       drupal_set_message(t("Added new object association."));
     }
   }
-
-  // Redirect browser to the new object.
-  if ($new_assoc_id) {
-    $form_state['redirect'] = "islandora/object/{$new_assoc_id}";
-  }
-  else {
-    $form_state['redirect'] = "islandora/object/{$eadid}";
-  }
+  // Redirect back to the Finding Aid.
+  $form_state['redirect'] = "islandora/object/{$eadid}";
 }
