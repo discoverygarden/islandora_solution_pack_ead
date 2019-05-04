@@ -44,7 +44,7 @@ function islandora_ead_preprocess_islandora_ead(&$variables) {
   drupal_add_js(drupal_get_path('module', 'islandora_ead') . '/js/eadPopovers.js');
 
   $xsl = new DOMDocument();
-  $xsl->load(drupal_get_path('module', 'islandora_ead') . '/xml/islandora_eadToHTML.xsl');
+  $xsl->load(drupal_get_path('module', 'islandora_ead') . '/xml/ead-to-html.xsl');
 
   $xslt = new XSLTProcessor();
   $xslt->importStyleSheet($xsl);
