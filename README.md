@@ -19,6 +19,10 @@ placed in sites/all/libraries:
 * Bootstrap should be extracted into a libraries folder called 'bootstrap'
 * `popper.min.js` should be placed in a libraries folder called 'popper.js'
 
+All finding aids should have their namespace declared as `xmlns="urn:isbn:1-931666-22-9"`.
+
+The module supports EAD 2002. It does not support EAD3.
+
 ## Installation
 
 Install as usual, see
