@@ -43,18 +43,14 @@ function islandora_ead_preprocess_islandora_ead(&$variables) {
   drupal_add_js($bootstrap . '/js/bootstrap.min.js');
   drupal_add_js(drupal_get_path('module', 'islandora_ead') . '/js/eadPopovers.js');
 
-  $xsl = new DOMDocument();
-  $xsl->load(drupal_get_path('module', 'islandora_ead') . '/xml/ead-to-html.xsl');
-
-  $xslt = new XSLTProcessor();
-  $xslt->importStyleSheet($xsl);
+  $transformed_xml = islandora_ead_transform_with_saxonb(
+    'ead-to-html.xsl',
+    $object['EAD']->content
+  );
 
   $object_actual_dom = new DOMDocument();
   $object_actual_dom->preserveWhiteSpace = FALSE;
-  $object_actual_dom->loadXML($object['EAD']->content);
-  $object_actual_dom = $xslt->transformToDoc($object_actual_dom);
-
-  $transformed_xml = simplexml_import_dom($object_actual_dom);
+  $object_actual_dom->loadXML($transformed_xml);
 
   $xpath = new DOMXpath($object_actual_dom);
   foreach ($associated_objs as $levelid => $pid) {
@@ -82,7 +78,7 @@ function islandora_ead_preprocess_islandora_ead(&$variables) {
   }
 
   $content = array();
-  $content['narrative'] = $transformed_xml->asXML();
+  $content['narrative'] = simplexml_load_string($transformed_xml)->asXML();
 
   $variables['content'] = $content;
 }
