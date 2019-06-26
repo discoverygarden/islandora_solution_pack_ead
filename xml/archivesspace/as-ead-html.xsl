@@ -1078,7 +1078,7 @@
                         </th>
                     </tr>
                     <!-- Adds grouped instances if they exist -->
-                    <xsl:for-each-group select="ead:did/ead:container" group-starting-with=".[@label]">
+                    <xsl:for-each-group select="ead:did/ead:container" group-starting-with="ead:container[@label]">
                         <tr>
                             <xsl:apply-templates select="current-group()" mode="series"/>
                             <xsl:choose>
@@ -1109,7 +1109,7 @@
                         </td>
                     </tr>
                     <!-- Groups instances by label attribute, the way they are grouped in ArchivesSpace -->
-                    <xsl:for-each-group select="ead:did/ead:container" group-starting-with=".[@label]">
+                    <xsl:for-each-group select="ead:did/ead:container" group-starting-with="ead:container[@label]">
                         <tr>
                             <xsl:apply-templates select="current-group()" />
                             <xsl:choose>
