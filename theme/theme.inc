@@ -42,6 +42,7 @@ function islandora_ead_preprocess_islandora_ead(&$variables) {
   drupal_add_css($bootstrap . '/css/bootstrap.min.css');
   drupal_add_js($bootstrap . '/js/bootstrap.min.js');
   drupal_add_js(drupal_get_path('module', 'islandora_ead') . '/js/eadPopovers.js');
+  drupal_add_css(drupal_get_path('module', 'islandora_ead') . '/css/islandora_ead.css');
 
   $transformed_xml = islandora_ead_transform_with_saxonb(
     'ead-to-html.xsl',
