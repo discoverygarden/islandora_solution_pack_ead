@@ -37,11 +37,19 @@ function islandora_ead_preprocess_islandora_ead(&$variables) {
 
   module_load_include('inc', 'islandora_ead', 'includes/utilities');
   $associated_objs = islandora_ead_retrieve_associations($object->id);
+
   $bootstrap = libraries_get_path('bootstrap');
-  drupal_add_js(libraries_get_path('popper.js') . '/popper.min.js');
-  drupal_add_css($bootstrap . '/css/bootstrap.min.css');
-  drupal_add_js($bootstrap . '/js/bootstrap.min.js');
-  drupal_add_js(drupal_get_path('module', 'islandora_ead') . '/js/eadPopovers.js');
+  if (libraries_get_path('bootstrap')) {
+    drupal_add_css($bootstrap . '/css/bootstrap.min.css');
+    drupal_add_js($bootstrap . '/js/bootstrap.min.js');
+  }
+
+  $popper = libraries_get_path('popper.js');
+  if ($popper) {
+    drupal_add_js($popper . '/popper.min.js');
+    drupal_add_js(drupal_get_path('module', 'islandora_ead') . '/js/eadPopovers.js');
+  }
+
   drupal_add_css(drupal_get_path('module', 'islandora_ead') . '/css/islandora_ead.css');
 
   $transformed_xml = islandora_ead_transform_with_saxonb(
