@@ -117,15 +117,12 @@ function islandora_ead_retrieve_refid_association($eadid, $refid) {
  *   String describing the level information.
  */
 function islandora_ead_get_level_info(AbstractObject $ead, $refid) {
-  $xsl = new DOMDocument();
-  $xsl->load(drupal_get_path('module', 'islandora_ead') . '/xml/getEadLevels.xsl');
-
-  $xslt = new XSLTProcessor();
-  $xslt->importStyleSheet($xsl);
-
-  $ead_dom = new DOMDocument();
-  $ead_dom->loadXML($ead['EAD']->content);
-  $ead_dom = $xslt->transformToDoc($ead_dom);
+  $ead_xml = islandora_ead_transform_with_saxonb(
+    'getEadLevels.xsl',
+    $ead['EAD']->content
+  );
+  $ead_dom = new DomDocument();
+  $ead_dom->loadXML($ead_xml);
 
   $xpath = new DOMXPath($ead_dom);
   $entity = $xpath->query("/entities/entity[id = '$refid']")->item(0);

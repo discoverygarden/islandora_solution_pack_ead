@@ -45,15 +45,12 @@ function islandora_ead_manage_form(array $form, array &$form_state, AbstractObje
     t('Association'),
   );
 
-  $xsl = new DOMDocument();
-  $xsl->load(drupal_get_path('module', 'islandora_ead') . '/xml/getEadLevels.xsl');
-
-  $xslt = new XSLTProcessor();
-  $xslt->importStyleSheet($xsl);
-
+  $ead_xml = islandora_ead_transform_with_saxonb(
+    'getEadLevels.xsl',
+    $object['EAD']->content
+  );
   $ead_dom = new DOMDocument();
-  $ead_dom->loadXML($object['EAD']->content);
-  $ead_dom = $xslt->transformToDoc($ead_dom);
+  $ead_dom->loadXML($ead_xml);
 
   $partsxml = new DOMDocument();
   $partsxml->loadXML($ead_dom->saveXML());

@@ -87,7 +87,7 @@ function islandora_ead_preprocess_islandora_ead(&$variables) {
   }
 
   $content = array();
-  $content['narrative'] = simplexml_load_string($transformed_xml)->asXML();
+  $content['narrative'] = $object_actual_dom->saveXML();
 
   $variables['content'] = $content;
 }
