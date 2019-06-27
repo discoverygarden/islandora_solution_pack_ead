@@ -24,8 +24,10 @@
             <!-- this is gross and invalid, needs fixed by dev -->
             <div class="publication"><xsl:apply-templates select="ead:ead/ead:eadheader/ead:filedesc/ead:publicationstmt/ead:publisher"/></div>
                 <div id="main">
-                    <xsl:apply-templates select="ead:ead/ead:archdesc" mode="toc"/>
-                    <xsl:apply-templates select="ead:ead/ead:archdesc"/>
+                    <section class="ead-container">
+                      <xsl:apply-templates select="ead:ead/ead:archdesc" mode="toc"/>
+                      <xsl:apply-templates select="ead:ead/ead:archdesc"/>
+                    </section>
                 </div>
             </div>
     </xsl:template>
