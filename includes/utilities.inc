@@ -170,7 +170,8 @@ function islandora_ead_transform_with_saxonb($xsl_name, $doc, array $params = ar
   $escaped = array_map($equal_join_and_escape, array_keys($params), $params);
   $param_string = implode(' ', $escaped);
 
-  $process = proc_open("saxonb-xslt -versionmsg:off - $xsl_path $param_string",
+  $saxonb_bin = variable_get('islandora_ead_saxonb_path', '/usr/bin/saxonb-xslt');
+  $process = proc_open("$saxonb_bin -versionmsg:off - $xsl_path $param_string",
     array(
       0 => array(
         'pipe',

@@ -12,6 +12,10 @@ This module requires the following modules/libraries:
 * [Islandora](https://github.com/islandora/islandora)
 * [Tuque](https://github.com/islandora/tuque)
 
+This module also requires [saxonb](http://manpages.ubuntu.com/manpages/trusty/man1/saxonb-xslt.1.html) since
+it relies on XSLT 2.0. The `saxonb-xslt` binary is assumed to be at `/usr/bin/saxonb-xslt` by default, but
+this is configurable in the module admin.
+
 In addition, [Bootstrap](https://getbootstrap.com/) and
 [Popper.js](https://github.com/FezVrasta/popper.js) should be downloaded and
 placed in sites/all/libraries:
