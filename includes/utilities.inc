@@ -196,6 +196,5 @@ function islandora_ead_transform_with_saxonb($xsl_name, $doc, array $params = ar
   fclose($pipes[1]);
   proc_close($process);
 
-  watchdog('islandora_ead', $saxonb_transformed);
   return $saxonb_transformed;
 }
