@@ -12,9 +12,10 @@ This module requires the following modules/libraries:
 * [Islandora](https://github.com/islandora/islandora)
 * [Tuque](https://github.com/islandora/tuque)
 
-This module also requires [saxonb](http://manpages.ubuntu.com/manpages/trusty/man1/saxonb-xslt.1.html) since
-it relies on XSLT 2.0. The `saxonb-xslt` binary is assumed to be at `/usr/bin/saxonb-xslt` by default, but
-this is configurable in the module admin.
+This module also requires
+[saxonb](http://manpages.ubuntu.com/manpages/trusty/man1/saxonb-xslt.1.html)
+since it relies on XSLT 2.0. The `saxonb-xslt` binary is assumed to be at
+`/usr/bin/saxonb-xslt` by default, but this is configurable in the module admin.
 
 In addition, [Bootstrap](https://getbootstrap.com/) and
 [Popper.js](https://github.com/FezVrasta/popper.js) should be downloaded and
@@ -23,7 +24,8 @@ placed in sites/all/libraries:
 * Bootstrap should be extracted into a libraries folder called 'bootstrap'
 * `popper.min.js` should be placed in a libraries folder called 'popper.js'
 
-All finding aids should have their namespace declared as `xmlns="urn:isbn:1-931666-22-9"`.
+All finding aids should have their namespace
+declared as `xmlns="urn:isbn:1-931666-22-9"`.
 
 The module supports EAD 2002. It does not support EAD3.
 
