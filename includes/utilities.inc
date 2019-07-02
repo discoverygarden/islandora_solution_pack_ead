@@ -117,10 +117,10 @@ function islandora_ead_retrieve_refid_association($eadid, $refid) {
  *   String describing the level information.
  */
 function islandora_ead_get_level_info(AbstractObject $ead, $refid) {
-  $ead_xml = islandora_ead_transform_with_saxonb(
-    'getEadLevels.xsl',
-    $ead['EAD']->content
-  );
+  module_load_include('inc', 'dgi_saxon_helper', 'includes/utilities');
+
+  $xslt_path = drupal_get_path('module', 'islandora_ead') . '/xml/getEadLevels.xsl';
+  $ead_xml = dgi_saxon_helper_transform_string_to_string($xslt_path, $ead['EAD']->content);
   $ead_dom = new DomDocument();
   $ead_dom->loadXML($ead_xml);
 
@@ -139,62 +139,4 @@ function islandora_ead_get_level_info(AbstractObject $ead, $refid) {
   }
   $level_info = implode(', ', $containers);
   return $level_info;
-}
-
-/**
- * Helper to transform XML using the named XSLT with saxonb.
- *
- * @param string $xsl_name
- *   Name of the XSL file to be used, relative to this module's "xml"
- *   directory.
- * @param string $doc
- *   The XML to convert.
- * @param array $params
- *   An optional associative array of XSLT parameters mapping parameter names
- *   to their values.
- *
- * @return string
- *   The transformed xml.
- */
-function islandora_ead_transform_with_saxonb($xsl_name, $doc, array $params = array()) {
-  $module_path = drupal_get_path('module', 'islandora_ead');
-  $xsl_path = format_string('!path/xml/!xsl', array(
-    '!path' => $module_path,
-    '!xsl' => $xsl_name,
-  ));
-
-  $pipes = array();
-  $equal_join_and_escape = function ($key, $value) {
-    return escapeshellarg("$key=$value");
-  };
-  $escaped = array_map($equal_join_and_escape, array_keys($params), $params);
-  $param_string = implode(' ', $escaped);
-
-  $saxonb_bin = variable_get('islandora_ead_saxonb_path', '/usr/bin/saxonb-xslt');
-  $process = proc_open("$saxonb_bin -versionmsg:off - $xsl_path $param_string",
-    array(
-      0 => array(
-        'pipe',
-        'r',
-      ),
-      1 => array(
-        'pipe',
-        'w',
-      ),
-      2 => array(
-        'file',
-        '/dev/null',
-        'a',
-      ),
-    ),
-    $pipes
-  );
-
-  fwrite($pipes[0], $doc);
-  fclose($pipes[0]);
-  $saxonb_transformed = stream_get_contents($pipes[1]);
-  fclose($pipes[1]);
-  proc_close($process);
-
-  return $saxonb_transformed;
 }

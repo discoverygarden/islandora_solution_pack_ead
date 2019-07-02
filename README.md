@@ -11,11 +11,13 @@ This module requires the following modules/libraries:
 
 * [Islandora](https://github.com/islandora/islandora)
 * [Tuque](https://github.com/islandora/tuque)
+* [dgi_saxon_helper](https://github.com/discoverygarden/dgi_saxon_helper)
 
-This module also requires
+This module requires
 [saxonb](http://manpages.ubuntu.com/manpages/trusty/man1/saxonb-xslt.1.html)
 since it relies on XSLT 2.0. The `saxonb-xslt` binary is assumed to be at
-`/usr/bin/saxonb-xslt` by default, but this is configurable in the module admin.
+`/usr/bin/saxonb-xslt` by default, but this is configurable in the
+`dgi_saxon_helper` admin.
 
 In addition, [Bootstrap](https://getbootstrap.com/) and
 [Popper.js](https://github.com/FezVrasta/popper.js) should be downloaded and

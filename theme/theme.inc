@@ -36,6 +36,7 @@ function islandora_ead_preprocess_islandora_ead(&$variables) {
   }
 
   module_load_include('inc', 'islandora_ead', 'includes/utilities');
+  module_load_include('inc', 'dgi_saxon_helper', 'includes/utilities');
   $associated_objs = islandora_ead_retrieve_associations($object->id);
 
   $bootstrap = libraries_get_path('bootstrap');
@@ -52,10 +53,8 @@ function islandora_ead_preprocess_islandora_ead(&$variables) {
 
   drupal_add_css(drupal_get_path('module', 'islandora_ead') . '/css/islandora_ead.css');
 
-  $transformed_xml = islandora_ead_transform_with_saxonb(
-    'ead-to-html.xsl',
-    $object['EAD']->content
-  );
+  $xslt_path = drupal_get_path('module', 'islandora_ead') . '/xml/ead-to-html.xsl';
+  $transformed_xml = dgi_saxon_helper_transform_string_to_string($xslt_path, $object['EAD']->content);
 
   $object_actual_dom = new DOMDocument();
   $object_actual_dom->preserveWhiteSpace = FALSE;

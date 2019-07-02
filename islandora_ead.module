@@ -30,16 +30,6 @@ const ISLANDORA_EAD_NAMESPACE = 'urn:isbn:1-931666-22-9';
 function islandora_ead_menu() {
   $items = array();
 
-  $items['admin/islandora/solution_pack_config/ead'] = array(
-    'title' => 'EAD Solution Pack',
-    'description' => 'Configuration the EAD solution pack.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('islandora_ead_admin'),
-    'access arguments' => array('administer site configuration'),
-    'file' => 'includes/admin.form.inc',
-    'type' => MENU_NORMAL_ITEM,
-  );
-
   $items['islandora/object/%islandora_object/manage/ead'] = array(
     'type' => MENU_LOCAL_TASK,
     'title' => 'EAD',

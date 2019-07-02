@@ -20,6 +20,7 @@ description = "Provides an interface for EAD objects."
 package = Islandora
 dependencies[] = islandora
 dependencies[] = islandora_solr
+dependencies[] = dgi_saxon_helper
 dependencies[] = file
 version = 7.x-dev
 core = 7.x
