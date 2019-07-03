@@ -36,25 +36,29 @@ function islandora_ead_preprocess_islandora_ead(&$variables) {
   }
 
   module_load_include('inc', 'islandora_ead', 'includes/utilities');
+  module_load_include('inc', 'dgi_saxon_helper', 'includes/utilities');
   $associated_objs = islandora_ead_retrieve_associations($object->id);
+
   $bootstrap = libraries_get_path('bootstrap');
-  drupal_add_js(libraries_get_path('popper.js') . '/popper.min.js');
-  drupal_add_css($bootstrap . '/css/bootstrap.min.css');
-  drupal_add_js($bootstrap . '/js/bootstrap.min.js');
-  drupal_add_js(drupal_get_path('module', 'islandora_ead') . '/js/eadPopovers.js');
+  if (libraries_get_path('bootstrap')) {
+    drupal_add_css($bootstrap . '/css/bootstrap.min.css');
+    drupal_add_js($bootstrap . '/js/bootstrap.min.js');
+  }
 
-  $xsl = new DOMDocument();
-  $xsl->load(drupal_get_path('module', 'islandora_ead') . '/xml/islandora_eadToHTML.xsl');
+  $popper = libraries_get_path('popper.js');
+  if ($popper) {
+    drupal_add_js($popper . '/popper.min.js');
+    drupal_add_js(drupal_get_path('module', 'islandora_ead') . '/js/eadPopovers.js');
+  }
 
-  $xslt = new XSLTProcessor();
-  $xslt->importStyleSheet($xsl);
+  drupal_add_css(drupal_get_path('module', 'islandora_ead') . '/css/islandora_ead.css');
+
+  $xslt_path = drupal_get_path('module', 'islandora_ead') . '/xml/ead-to-html.xsl';
+  $transformed_xml = dgi_saxon_helper_transform_string_to_string($xslt_path, $object['EAD']->content);
 
   $object_actual_dom = new DOMDocument();
   $object_actual_dom->preserveWhiteSpace = FALSE;
-  $object_actual_dom->loadXML($object['EAD']->content);
-  $object_actual_dom = $xslt->transformToDoc($object_actual_dom);
-
-  $transformed_xml = simplexml_import_dom($object_actual_dom);
+  $object_actual_dom->loadXML($transformed_xml);
 
   $xpath = new DOMXpath($object_actual_dom);
   foreach ($associated_objs as $levelid => $pid) {
@@ -82,7 +86,7 @@ function islandora_ead_preprocess_islandora_ead(&$variables) {
   }
 
   $content = array();
-  $content['narrative'] = $transformed_xml->asXML();
+  $content['narrative'] = $object_actual_dom->saveXML();
 
   $variables['content'] = $content;
 }

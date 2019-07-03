@@ -33,6 +33,7 @@
  *   The object representing the EAD.
  */
 function islandora_ead_manage_form(array $form, array &$form_state, AbstractObject $object) {
+  module_load_include('inc', 'dgi_saxon_helper', 'includes/utilities');
   module_load_include('inc', 'islandora_ead', 'includes/utilities');
 
   $header = array(
@@ -45,15 +46,10 @@ function islandora_ead_manage_form(array $form, array &$form_state, AbstractObje
     t('Association'),
   );
 
-  $xsl = new DOMDocument();
-  $xsl->load(drupal_get_path('module', 'islandora_ead') . '/xml/getEadLevels.xsl');
-
-  $xslt = new XSLTProcessor();
-  $xslt->importStyleSheet($xsl);
-
-  $ead_dom = new DOMDocument();
-  $ead_dom->loadXML($object['EAD']->content);
-  $ead_dom = $xslt->transformToDoc($ead_dom);
+  $xslt_path = drupal_get_path('module', 'islandora_ead') . '/xml/getEadLevels.xsl';
+  $ead_xml = dgi_saxon_helper_transform_string_to_string($xslt_path, $object['EAD']->content);
+  $ead_dom = new DomDocument();
+  $ead_dom->loadXML($ead_xml);
 
   $partsxml = new DOMDocument();
   $partsxml->loadXML($ead_dom->saveXML());

@@ -1,62 +1,194 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
- This Educational Community License (the "License") applies to any original
- work of authorship (the "Original Work") whose owner (the "Licensor") has
- placed the following notice immediately following the copyright notice for
- the Original Work:
-
- Copyright (c) 2006-2012; Five Colleges, Inc., New York University,
- and UC Regents
-
- Licensed under the Educational Community License version 1.0
-
- This Original Work, including software, source code, documents, or other
- related items, is being provided by the copyright holder(s) subject to the
- terms of the Educational Community License. By obtaining, using and/or
- copying this Original Work, you agree that you have read, understand, and
- will comply with the following terms and conditions of the Educational
- Community License:
-
- Permission to use, copy, modify, merge, publish, distribute, and sublicense
- this Original Work and its documentation, with or without modification, for
- any purpose, and without fee or royalty to the copyright holder(s) is
- hereby granted, provided that you include the following on ALL copies of
- the Original Work or portions thereof, including modifications or
- derivatives, that you make:
-
- The full text of the Educational Community License in a location viewable
- to users of the redistributed or derivative work.
-
- Any pre-existing intellectual property disclaimers, notices, or terms and
- conditions.
-
- Notice of any changes or modifications to the Original Work, including the
- date the changes were made.
-
- Any modifications of the Original Work must be distributed in
- such a manner as to avoid any confusion with the Original Work of the
- copyright holders.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- DEALINGS IN THE SOFTWARE.
-
- The name and trademarks of copyright holder(s) may NOT be used in
- advertising or publicity pertaining to the Original or Derivative Works
- without specific, written prior permission. Title to copyright in the
- Original Work and any associated documentation will at all times remain
- with the copyright holders.
--->
-<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-    xmlns:ead="urn:isbn:1-931666-22-9"
-    xmlns:ns2="http://www.w3.org/1999/xlink">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns2="http://www.w3.org/1999/xlink" xmlns:local="http://www.yoursite.org/namespace" xmlns:ead="urn:isbn:1-931666-22-9" version="2.0"  exclude-result-prefixes="#all">
+    <!--
+        *******************************************************************
+        *                                                                 *
+        * VERSION:          1.0                                           *
+        *                                                                 *
+        * AUTHOR:           Winona Salesky                                *
+        *                   wsalesky@gmail.com                            *
+        *                                                                 *
+        * DATE:             2013-08-14                                    *
+        *                                                                 *
+        * ABOUT:            This file has been created for use with       *
+        *                   EAD xml files exported from the               *
+        *                   ArchivesSpace web application.                *
+        *                                                                 *
+        *******************************************************************
+    -->
     <xsl:strip-space elements="*"/>
-    <xsl:output method="xml" encoding="utf-8" indent="yes"/>
+    <xsl:output encoding="utf-8" indent="yes"/>
+    <!-- A local function to check for element ids and generate an id if no id exists -->
+    <xsl:function name="local:buildID">
+        <xsl:param name="element"/>
+        <xsl:choose>
+            <xsl:when test="$element/@id">
+                <xsl:value-of select="$element/@id"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="generate-id($element)"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
+    <!-- 
+        A local function to name all child elements with no head tag. 
+        Tag names addapted from EAD tag library (http://www.loc.gov/ead/tglib/element_index.html)
+    -->
+    <xsl:function name="local:tagName">
+        <!-- element node as parameter -->
+        <xsl:param name="elementNode"/>
+        <!-- Name of element -->
+        <xsl:variable name="tag" select="name($elementNode)"/>
+        <!-- Find element name -->
+        <xsl:choose>
+            <xsl:when test="$elementNode/ead:head"><xsl:value-of select="$elementNode/ead:head"/></xsl:when>
+            <xsl:when test="$tag = 'did'">Summary Information</xsl:when>
+            <xsl:when test="$tag = 'abstract'">Abstract</xsl:when>
+            <xsl:when test="$tag = 'accruals'">Accruals</xsl:when>  
+            <xsl:when test="$tag = 'acqinfo'">Acquisition Information</xsl:when>
+            <xsl:when test="$tag = 'address'">Address</xsl:when>  
+            <xsl:when test="$tag = 'altformavail'">Alternative Form Available</xsl:when>
+            <xsl:when test="$tag = 'appraisal'">Appraisal Information</xsl:when>   
+            <xsl:when test="$tag = 'arc'">Arc</xsl:when>
+            <xsl:when test="$tag = 'archref'">Archival Reference</xsl:when>   
+            <xsl:when test="$tag = 'arrangement'">Arrangement</xsl:when>
+            <xsl:when test="$tag = 'author'">Author</xsl:when>   
+            <xsl:when test="$tag = 'bibref'">Bibliographic Reference</xsl:when>
+            <xsl:when test="$tag = 'bibseries'">Bibliographic Series</xsl:when>   
+            <xsl:when test="$tag = 'bibliography'">Bibliography</xsl:when>
+            <xsl:when test="$tag = 'bioghist'">Biography or History</xsl:when>    
+            <xsl:when test="$tag = 'change'">Change</xsl:when>
+            <xsl:when test="$tag = 'chronlist'">Chronology List</xsl:when>    
+            <xsl:when test="$tag = 'accessrestrict'">Conditions Governing Access</xsl:when>
+            <xsl:when test="$tag = 'userestrict'">Conditions Governing Use</xsl:when>   
+            <xsl:when test="$tag = 'controlaccess'">Controlled Access Headings</xsl:when>
+            <xsl:when test="$tag = 'corpname'">Corporate Name</xsl:when>   
+            <xsl:when test="$tag = 'creation'">Creation</xsl:when>
+            <xsl:when test="$tag = 'custodhist'">Custodial History</xsl:when>   
+            <xsl:when test="$tag = 'date'">Date</xsl:when>    
+            <xsl:when test="$tag = 'descgrp'">Description Group</xsl:when>
+            <xsl:when test="$tag = 'dsc'">Collection Inventory</xsl:when>   
+            <xsl:when test="$tag = 'descrules'">Descriptive Rules</xsl:when>     
+            <xsl:when test="$tag = 'dao'">Digital Object</xsl:when>
+            <xsl:when test="$tag = 'daodesc'">Digital Object Description</xsl:when>
+            <xsl:when test="$tag = 'daogrp'">Digital Object Group</xsl:when>     
+            <xsl:when test="$tag = 'daoloc'">Digital Object Location</xsl:when> 
+            <xsl:when test="$tag = 'dimensions'">Dimensions</xsl:when>
+            <xsl:when test="$tag = 'edition'">Edition</xsl:when>     
+            <xsl:when test="$tag = 'editionstmt'">Edition Statement</xsl:when>
+            <xsl:when test="$tag = 'event'">Event</xsl:when>     
+            <xsl:when test="$tag = 'eventgrp'">Event Group</xsl:when>
+            <xsl:when test="$tag = 'expan'">Expansion</xsl:when> 
+            <xsl:when test="$tag = 'extptr'">Extended Pointer</xsl:when>
+            <xsl:when test="$tag = 'extptrloc'">Extended Pointer Location</xsl:when>
+            <xsl:when test="$tag = 'extref'">Extended Reference</xsl:when>
+            <xsl:when test="$tag = 'extrefloc'">Extended Reference Location</xsl:when>
+            <xsl:when test="$tag = 'extent'">Extent</xsl:when>
+            <xsl:when test="$tag = 'famname'">Family Name</xsl:when>
+            <xsl:when test="$tag = 'filedesc'">File Description</xsl:when>
+            <xsl:when test="$tag = 'fileplan'">File Plan</xsl:when>
+            <xsl:when test="$tag = 'frontmatter'">Front Matter</xsl:when>
+            <xsl:when test="$tag = 'function'">Function</xsl:when>
+            <xsl:when test="$tag = 'genreform'">Genre/Physical Characteristic</xsl:when>
+            <xsl:when test="$tag = 'geogname'">Geographic Name</xsl:when>
+            <xsl:when test="$tag = 'imprint'">Imprint</xsl:when>
+            <xsl:when test="$tag = 'index'">Index</xsl:when>
+            <xsl:when test="$tag = 'indexentry'">Index Entry</xsl:when>
+            <xsl:when test="$tag = 'item'">Item</xsl:when>
+            <xsl:when test="$tag = 'language'">Language</xsl:when>
+            <xsl:when test="$tag = 'langmaterial'">Language of the Material</xsl:when>
+            <xsl:when test="$tag = 'langusage'">Language Usage</xsl:when>
+            <xsl:when test="$tag = 'legalstatus'">Legal Status</xsl:when>
+            <xsl:when test="$tag = 'linkgrp'">Linking Group</xsl:when>
+            <xsl:when test="$tag = 'originalsloc'">Location of Originals</xsl:when>
+            <xsl:when test="$tag = 'materialspec'">Material Specific Details</xsl:when>
+            <xsl:when test="$tag = 'name'">Name</xsl:when>
+            <xsl:when test="$tag = 'namegrp'">Name Group</xsl:when>
+            <xsl:when test="$tag = 'note'">Note</xsl:when>
+            <xsl:when test="$tag = 'notestmt'">Note Statement</xsl:when>
+            <xsl:when test="$tag = 'occupation'">Occupation</xsl:when>
+            <xsl:when test="$tag = 'origination'">Origination</xsl:when>
+            <xsl:when test="$tag = 'odd'">Other Descriptive Data</xsl:when>
+            <xsl:when test="$tag = 'otherfindaid'">Other Finding Aid</xsl:when>
+            <xsl:when test="$tag = 'persname'">Personal Name</xsl:when>
+            <xsl:when test="$tag = 'phystech'">Physical Characteristics and Technical Requirements</xsl:when>
+            <xsl:when test="$tag = 'physdesc'">Physical Description</xsl:when>
+            <xsl:when test="$tag = 'physfacet'">Physical Facet</xsl:when>
+            <xsl:when test="$tag = 'physloc'">Physical Location</xsl:when>
+            <xsl:when test="$tag = 'ptr'">Pointer</xsl:when>
+            <xsl:when test="$tag = 'ptrgrp'">Pointer Group</xsl:when>
+            <xsl:when test="$tag = 'ptrloc'">Pointer Location</xsl:when>
+            <xsl:when test="$tag = 'prefercite'">Preferred Citation</xsl:when>
+            <xsl:when test="$tag = 'processinfo'">Processing Information</xsl:when>
+            <xsl:when test="$tag = 'profiledesc'">Profile Description</xsl:when>
+            <xsl:when test="$tag = 'publicationstmt'">Publication Statement</xsl:when>
+            <xsl:when test="$tag = 'publisher'">Publisher</xsl:when> 
+            <xsl:when test="$tag = 'ref'">Reference</xsl:when>
+            <xsl:when test="$tag = 'refloc'">Reference Location</xsl:when>
+            <xsl:when test="$tag = 'relatedmaterial'">Related Material</xsl:when>
+            <xsl:when test="$tag = 'repository'">Repository</xsl:when>
+            <xsl:when test="$tag = 'resource'">Resource</xsl:when>
+            <xsl:when test="$tag = 'revisiondesc'">Revision Description</xsl:when>
+            <xsl:when test="$tag = 'runner'">Runner</xsl:when>
+            <xsl:when test="$tag = 'scopecontent'">Scope and Content</xsl:when>
+            <xsl:when test="$tag = 'separatedmaterial'">Separated Material</xsl:when>
+            <xsl:when test="$tag = 'seriesstmt'">Series Statement</xsl:when>
+            <xsl:when test="$tag = 'sponsor'">Sponsor</xsl:when>
+            <xsl:when test="$tag = 'subject'">Subject</xsl:when>
+            <xsl:when test="$tag = 'subarea'">Subordinate Area</xsl:when>
+            <xsl:when test="$tag = 'subtitle'">Subtitle</xsl:when>
+            <xsl:when test="$tag = 'div'">Text Division</xsl:when>
+            <xsl:when test="$tag = 'title'">Title</xsl:when>
+            <xsl:when test="$tag = 'unittitle'">Title</xsl:when>
+            <xsl:when test="$tag = 'unitdate'">Date</xsl:when>
+            <xsl:when test="$tag = 'unitid'">ID</xsl:when>
+            <xsl:when test="$tag = 'titlepage'">Title Page</xsl:when>
+            <xsl:when test="$tag = 'titleproper'">Title Proper of the Finding Aid</xsl:when>
+            <xsl:when test="$tag = 'titlestmt'">Title Statement</xsl:when>   
+            <!-- eac-cpf fields -->
+            <xsl:when test="$tag = 'identity'">Name(s)</xsl:when>
+            <xsl:when test="$tag = 'description'">Description</xsl:when>
+            <xsl:when test="$tag = 'relations'">Relations</xsl:when>
+            <xsl:when test="$tag = 'structureOrGenealogy'">Structure Or Genealogy</xsl:when>
+            <xsl:when test="$tag = 'localDescription'">Local Description</xsl:when>
+            <xsl:when test="$tag= 'generalContext'">General Context</xsl:when>
+            <xsl:when test="$tag= 'alternativeSet'">Alternative Set</xsl:when>
+            <xsl:when test="$tag= 'functions'">Functions</xsl:when>
+            <xsl:when test="$tag= 'biogHist'">Biography or History</xsl:when>
+            
+        </xsl:choose>
+    </xsl:function>
+   
+    <!-- 
+        A local function to parse ISO dates into more readable dates.
+        Takes a date formatted like this: 2009-11-18T10:16-0500
+        Returns: November 18, 2009
+    -->
+    <xsl:function name="local:parseDate">
+        <xsl:param name="dateString"/>
+        <xsl:variable name="month">
+            <xsl:choose>
+                <xsl:when test="substring($dateString,6,2) = '01'">January</xsl:when>
+                <xsl:when test="substring($dateString,6,2) = '02'">February</xsl:when>
+                <xsl:when test="substring($dateString,6,2) = '03'">March</xsl:when>
+                <xsl:when test="substring($dateString,6,2) = '04'">April</xsl:when>
+                <xsl:when test="substring($dateString,6,2) = '05'">May</xsl:when>
+                <xsl:when test="substring($dateString,6,2) = '06'">June</xsl:when>
+                <xsl:when test="substring($dateString,6,2) = '07'">July</xsl:when>
+                <xsl:when test="substring($dateString,6,2) = '08'">August</xsl:when>
+                <xsl:when test="substring($dateString,6,2) = '09'">September</xsl:when>
+                <xsl:when test="substring($dateString,6,2) = '10'">October</xsl:when>
+                <xsl:when test="substring($dateString,6,2) = '11'">November</xsl:when>
+                <xsl:when test="substring($dateString,6,2) = '12'">December</xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:value-of select="concat($month,' ',substring($dateString,9,2),', ',substring($dateString,1,4))"/>
+    </xsl:function>
+    
+    <!-- 
+        Prints out full language name from abbreviation. 
+        List based on the ISO 639-2b three-letter language codes (http://www.loc.gov/standards/iso639-2/php/code_list.php). 
+    -->
     <xsl:template match="ead:language">
         <xsl:choose>
             <xsl:when test="@langcode = 'No_linguistic_content'">No linguistic content</xsl:when>
@@ -400,7 +532,6 @@
                 <xsl:when test="@langcode = 'raj'">Rajasthani</xsl:when>
                 <xsl:when test="@langcode = 'rap'">Rapanui</xsl:when>
                 <xsl:when test="@langcode = 'rar'">Rarotongan</xsl:when>
-                <xsl:when test="@langcode = 'qaa-qtz'">Reserved for local user</xsl:when>
                 <xsl:when test="@langcode = 'roa'">Romance (Other)</xsl:when>
                 <xsl:when test="@langcode = 'rom'">Romani</xsl:when>
                 <xsl:when test="@langcode = 'rum'">Romanian</xsl:when>
@@ -522,6 +653,8 @@
                 <xsl:when test="@langcode = 'zun'">Zuni</xsl:when>
         </xsl:choose>
     </xsl:template>
+    
+    <!-- Prnts full subject authority names -->
     <xsl:template name="subjectSource">
         <xsl:choose>
             <xsl:when test="@source = 'aat'"> [Source: Art &amp; Architecture Thesaurus]</xsl:when>
