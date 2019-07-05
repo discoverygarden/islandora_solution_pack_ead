@@ -94,6 +94,7 @@ EOQ;
  */
 function islandora_ead_retrieve_refid_association($eadid, $refid) {
   $qp = new IslandoraSolrQueryProcessor();
+  $qp->buildQuery('*:*');
   $qp->solrParams['fl'] = 'PID';
   $qp->solrParams['fq'] = array(
     "RELS_EXT_isPartOf_uri_ms:\"info:fedora/{$eadid}\"",
