@@ -613,7 +613,7 @@
     
     <!-- General headings -->
     <!-- Most head tags are handled by local:tagName function --> 
-    <xsl:template match="ead:head[parent::*/parent::ead:archdesc]"/>
+    <xsl:template match="ead:head[parent::*[not(self::ead:controlaccess)]/parent::ead:archdesc]"/>
     <xsl:template match="ead:head">
         <h4 id="{local:buildID(parent::*)}"><xsl:apply-templates/></h4>
     </xsl:template>
