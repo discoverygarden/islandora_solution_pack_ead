@@ -19,12 +19,16 @@ since it relies on XSLT 2.0. The `saxonb-xslt` binary is assumed to be at
 `/usr/bin/saxonb-xslt` by default, but this is configurable in the
 `dgi_saxon_helper` admin.
 
-In addition, [Bootstrap](https://getbootstrap.com/) and
-[Popper.js](https://github.com/FezVrasta/popper.js) should be downloaded and
-placed in sites/all/libraries:
+In addition, [Bootstrap](https://getbootstrap.com/docs/3.4/) and
+[Popper.js](https://unpkg.com/popper.js@1.15.0/dist/umd/popper.min.js) should be 
+downloaded and placed in sites/all/libraries:
 
 * Bootstrap should be extracted into a libraries folder called 'bootstrap'
 * `popper.min.js` should be placed in a libraries folder called 'popper.js'
+
+In addition, if using bootstrap ensure [jQuery Update](
+https://www.drupal.org/project/jquery_update) is installed and configured to use
+jQuery 1.9.1 or later.
 
 All finding aids should have their namespace
 declared as `xmlns="urn:isbn:1-931666-22-9"`.
@@ -39,7 +43,8 @@ further information.
 
 ## Troubleshooting/Issues
 
-Having problems or solved a problem? Contact [discoverygarden](http://support.discoverygarden.ca).
+Having problems or solved a problem? Contact [discoverygarden](
+http://support.discoverygarden.ca).
 
 ## Maintainers/Sponsors
 
@@ -50,7 +55,8 @@ Current maintainers:
 ## Development
 
 If you would like to contribute to this module, please check out our helpful
-[Documentation for Developers](https://github.com/Islandora/islandora/wiki#wiki-documentation-for-developers)
+[Documentation for Developers](
+https://github.com/Islandora/islandora/wiki#wiki-documentation-for-developers)
 info, [Developers](http://islandora.ca/developers) section on Islandora.ca and
 contact [discoverygarden](http://support.discoverygarden.ca).
 
